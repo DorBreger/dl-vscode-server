@@ -29,14 +29,14 @@ script at [b01/download-vs-code-server.sh]
 
 ### Shell
 ```shell
-curl -L https://raw.githubusercontent.com/b01/dl-vscode-server/main/download-vs-code-server.sh | bash -s -- "linux"
+curl -L https://raw.githubusercontent.com/DorBreger/dl-vscode-server/main/download-vs-code.sh| bash -s -- "linux"
 ```
 
 ### Docker
 
 ```dockerfile
 ADD --chmod=777 \
-    https://raw.githubusercontent.com/b01/dl-vscode-server/updates-2024-05-16-01/download-vs-code.sh \
+    https://raw.githubusercontent.com/DorBreger/dl-vscode-server/main/download-vs-code.sh \
     .
 
 # Install VS Code Server and Requirements
