@@ -43,6 +43,12 @@ Options
 --cli
     Switches the binary download VS Code CLI.
 
+--version
+    The version of vscode server to match againt. Incompatible with --commit.
+
+--commit
+    The commit to use for the download, instead of fetching the latest. Incompatible with --version
+
 --alpine
     Only works when downloading VS Code Server, it will force PLATFORM=linux and
     ARCH=alpine, as the developers deviated from the standard format used for
@@ -156,6 +162,26 @@ while [ ${#} -gt 0 ]; do
             echo "${usage}"
             exit 0
             ;;
+        --version)
+            if [ -n "$1" ] && [ "$1" = "${1#-}" ]; then
+                BUILD="stable"
+                VERSION="$1"
+                shift
+            else
+                echo "Error: --version requires a parameter"
+                exit 1
+            fi
+            ;;
+        --commit)
+            if [ -n "$1" ] && [ "$1" = "${1#-}" ]; then
+                BUILD="stable"
+                commit_sha="$1"
+                shift
+            else
+                echo "Error: --commit requires a parameter"
+                exit 1
+            fi
+            ;;
         --extensions)
             if [ -n "$1" ] && [ "$1" = "${1#-}" ]; then
                 EXTENSIONS="$1"
@@ -215,8 +241,15 @@ if [ "${BIN_TYPE}" = "server" -a ${IS_ALPINE} -eq 1 ]; then
     ARCH="alpine" # Alpine is NOT an Arch but a flavor of Linux, oh well.
 fi
 
-# We hard-code this because all but a few options returns a 404.
-commit_sha=$(get_latest_release "win32" "x64" "${BUILD}")
+if [ -n "${commit_sha}" ] && [ -n "${VERSION}" ]; then
+    echo "Error: --version and --commit are incompatible"
+    exit 2
+elif [ -n "${VERSION}" ]; then
+    commit_sha=$(curl -I --silent "https://update.code.visualstudio.com/${VERSION}/${BIN_TYPE}-${PLATFORM}-${ARCH}" | grep -oP "/stable/\K[^/]+")
+elif [ -z "${commit_sha}" ]; then
+    # We hard-code this because all but a few options returns a 404.
+    commit_sha=$(get_latest_release "win32" "x64" "${BUILD}")
+fi
 
 if [ -z "${commit_sha}" ]; then
     echo "could not get the VS Code latest commit sha, exiting"
