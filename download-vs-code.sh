@@ -245,7 +245,7 @@ if [ -n "${commit_sha}" ] && [ -n "${VERSION}" ]; then
     echo "Error: --version and --commit are incompatible"
     exit 2
 elif [ -n "${VERSION}" ]; then
-    commit_sha=$(curl -I --silent "https://update.code.visualstudio.com/${VERSION}/${BIN_TYPE}-${PLATFORM}-${ARCH}" | grep -oP "/stable/\K[^/]+")
+    commit_sha=$(curl -I --silent "https://update.code.visualstudio.com/${VERSION}/${BIN_TYPE}-${PLATFORM}-${ARCH}/stable" | grep -oP "/stable/\K[^/]+")
 elif [ -z "${commit_sha}" ]; then
     # We hard-code this because all but a few options returns a 404.
     commit_sha=$(get_latest_release "win32" "x64" "${BUILD}")
