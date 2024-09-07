@@ -1,4 +1,4 @@
-# DL VS Code Server
+# Offline dev containers
 
 This script downloads a tar of VS Code Server/CLI, then extracts it to a
 location expected by tunnels made by VS Code clients.
@@ -11,7 +11,7 @@ same version (marked by a commit hash) as it. If there is a mismatch between the
 installed in the container and vscode, vscode will attempt to install it again, which will fail 
 without internet. Therefore it is possible to specify a client `--version`, or provide the server tarball
 yourself (you can get it through something like `curl -L https://update.code.visualstudio.com/1.92.1/server-linux-x64/stable`) 
-with --tar
+with --tar.
 
 ## Background
 
