@@ -6,10 +6,12 @@ location expected by tunnels made by VS Code clients.
 The intention of this script is to pre-install the VS Code binary during
 container image build. This helps ensure, in certain scenarios, that the binary
 is there when internet is not; while still allowing your VS Code client to
-tunnel to the container.
-
-When the VS Code binary is out-of-date, to get the latest version, re-run the
-script.
+tunnel to the container. Vscode will attempt to look for a server installtion of the
+same version (marked by a commit hash) as it. If there is a mismatch between the vscode server
+installed in the container and vscode, vscode will attempt to install it again, which will fail 
+without internet. Therefore it is possible to specify a client `--version`, or provide the server tarball
+yourself (you can get it through something like `curl -L https://update.code.visualstudio.com/1.92.1/server-linux-x64/stable`) 
+with --tar
 
 ## Background
 
@@ -20,10 +22,6 @@ dev container to be ready.
 
 It originally started as a Gist; which you can review previous versions of the
 script at [b01/download-vs-code-server.sh]
-
-## Status
-
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/b01/dl-vscode-server/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/b01/dl-vscode-server/tree/main)
 
 ## How To Install
 
@@ -61,6 +59,9 @@ CLI).
 Will print the latest commit sha for VS Code (server and CLI are current
 synced and always the same)
 
+`--tar`
+    Allows to specify the tarball path to use for the installation. This allows building dev containers as part of a CI process in an isolated or air-gapped environment.
+
 `--cli`
 Switches the binary download VS Code CLI.
 
@@ -68,7 +69,7 @@ Switches the binary download VS Code CLI.
     The version of vscode server to match againt. Incompatible with --commit.
 
 `--commit`
-    The commit to use for the download, instead of fetching the latest. Incompatible with --version
+    The commit hash to use for the download, instead of fetching the latest. Incompatible with --version
 
 
 `--alpine`
