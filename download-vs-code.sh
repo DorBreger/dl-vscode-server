@@ -46,6 +46,9 @@ Options
 --version
     The version of vscode server to match againt. Incompatible with --commit.
 
+--tar
+    Allows to specify the tarball path to use for the installation. This allows building dev containers as part of a CI process in an isolated or air-gapped environment.
+
 --commit
     The commit to use for the download, instead of fetching the latest. Incompatible with --version
 
@@ -182,6 +185,15 @@ while [ ${#} -gt 0 ]; do
                 exit 1
             fi
             ;;
+        --tar)
+            if [ -n "$1" ] && [ "$1" = "${1#-}" ]; then
+                tarball="$1"
+                shift
+            else
+                echo "Error: --tar requires a parameter"
+                exit 2
+            fi
+            ;;
         --extensions)
             if [ -n "$1" ] && [ "$1" = "${1#-}" ]; then
                 EXTENSIONS="$1"
@@ -261,16 +273,23 @@ if [ "${DUMP_COMMIT_SHA}" = "yes" ]; then
     exit 0
 fi
 
-echo "attempting to download and pre-install VS Code ${BIN_TYPE} version '${commit_sha}'"
 
 options="${BIN_TYPE}-${PLATFORM}-${ARCH}"
 archive="vscode-${options}.tar.gz"
 
 # Download VS Code tarball to the current directory.
-url="https://update.code.visualstudio.com/commit:${commit_sha}/${options}/${BUILD}"
-printf "%s" "downloading ${url} to ${archive} "
-curl -s --fail -L "${url}" -o "/tmp/${archive}"
-echo "done"
+if [ -z "${tarball}" ]; then
+    echo "attempting to download and pre-install VS Code ${BIN_TYPE} version '${commit_sha}'"
+    url="https://update.code.visualstudio.com/commit:${commit_sha}/${options}/${BUILD}"
+    printf "%s" "downloading ${url} to ${archive} "
+    curl -s --fail -L "${url}" -o "/tmp/${archive}"
+    echo "done"
+else 
+    echo "using provided tarball for installation"
+    cp "${tarball}" "/tmp/${archive}"
+    echo "calculating commit sha from provided tarball"
+    commit_sha=$(tar -O -xzf "/tmp/${archive}" "vscode-${options}/product.json" | grep commit | grep -o '[a-f0-9]\{40\}')
+fi
 
 # Based on the binary type chosen, perform the installation.
 if [ "${BIN_TYPE}" = "cli" ]; then
