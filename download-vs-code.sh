@@ -301,6 +301,11 @@ fi
 echo "VS Code server pre-install completed"
 echo "downloading extensions..."
 
+if [ -z "$EXTENSIONS" ]; then
+    echo "no extensions to install"
+    exit 0
+fi
+
 echo "$EXTENSIONS" | tr ',' '\n' | while IFS= read -r ext; do
     ~/code-server --install-extension "$ext"
 done
