@@ -1,27 +1,18 @@
 # Offline dev containers
-
-This script downloads a tar of VS Code Server/CLI, then extracts it to a
-location expected by tunnels made by VS Code clients.
-
-The intention of this script is to pre-install the VS Code binary during
-container image build. This helps ensure, in certain scenarios, that the binary
-is there when internet is not; while still allowing your VS Code client to
-tunnel to the container. Vscode will attempt to look for a server installtion of the
-same version (marked by a commit hash) as it. If there is a mismatch between the vscode server
-installed in the container and vscode, vscode will attempt to install it again, which will fail 
-without internet. Therefore it is possible to specify a client `--version`, or provide the server tarball
-yourself (you can get it through something like `curl -L https://update.code.visualstudio.com/1.92.1/server-linux-x64/stable`) 
-with --tar.
-
 ## Background
+When selecting a container image to use as a dev container, vscode will attempt to download the necassery executables to a container instance of that image. This will obviously fail in an environment without an internet connection like an airplane.
 
-The original reason was and still is to prevent the constant download and
-install of VS Code server when the container is removed then run again later.
-With the server being embedded in the image, it should also reduce time for the
-dev container to be ready.
+## Motivation
+This tool allows the necassery executables to be pre-installed on the **image**.
 
-It originally started as a Gist; which you can review previous versions of the
-script at [b01/download-vs-code-server.sh]
+## Use cases
+
+The tool allows flexible usage. It is possible to bring the tarball that vscode will typically download yourself, To always use the latest version, or a specific vscode version.
+Therefore it is possible to build devcontainer images as part of a CI pipeline, on an internet enabled computer to later be transferred to an isolated network with a specific version of vscode, or even before a flight to allow work to be done when internet is unavailable.
+
+## A note on versions
+A version comptability between the executables downloaded onto the container and vscode is necassery. That means that this script won't work with an image built using `--version 1.92.1` when vscode 1.92.2 is used, because it will attempt to install the executables matching version 1.92.2. You **must** ensure version comptability. When ran without `--verion` or `--commit`, the script will use the latest version available, and thus the latest version of vscode available during the image build will need to be used. 
+
 
 ## How To Install
 
